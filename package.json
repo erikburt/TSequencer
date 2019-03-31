@@ -1,0 +1,16 @@
+{
+  "name": "t-sequencer",
+  "version": "1.0.0",
+  "description": "A web based music sequencer written in TS and p5.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"browser-sync start --server -w\" \" tsc --watch\""
+  },
+  "homepage": "https://github.com/erikburt/TSequencer",
+  "devDependencies": {
+    "@types/p5": "^0.7.1",
+    "browser-sync": "^2.26.3",
+    "concurrently": "^3.6.1",
+    "typescript": "^2.9.2"
+  }
+}
