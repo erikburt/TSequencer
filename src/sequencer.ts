@@ -16,7 +16,7 @@ interface ISequencer {
   play(grid: IPoint): void;
   toggle(grid: IPoint): void;
   initialDraw(p: p5): void;
-  draw(p: p5, oldStep: IPoint, newStep: IPoint): void;
+  draw(p: p5, oldStep: IPoint, newStep: IPoint, fullDraw: boolean): void;
   drawSquare(p: p5, point: IPoint, fill: number): void;
   mouseClicked(p: p5, click: IPoint): void;
 }
@@ -94,12 +94,25 @@ class Sequencer implements ISequencer {
   }
 
   // Draws the two squares that need to be updated
-  draw(p: p5, oldStep: IPoint, newStep: IPoint) {
+  draw(p: p5, oldStep: IPoint, newStep: IPoint, fullDraw: boolean) {
     p.strokeWeight(1);
     p.stroke(1);
 
-    this.drawSquare(p, newStep, 0);
+    if (fullDraw) {
+      for (let y = 0; y < this.size.y; y++) {
+        for (let x = 0; x < this.size.x; x++) {
+          let fill = 255;
+  
+          if (this.matrix[y][x]) fill = 100;
+  
+          this.drawSquare(p, { x: x, y: y }, fill);
+        }
+      }
+  
+      this.drawFilename(p);
+    }
 
+    this.drawSquare(p, newStep, 0);
     this.drawSquare(p, oldStep, this.matrix[oldStep.y][oldStep.x] ? 100 : 255);
   }
 

@@ -35,6 +35,7 @@ var sketch = (p) => {
     let MILLIS_PER_BEAT = (60 / BPM) * 1000;
     let BEAT_PER_SEC = BPM / 60;
     let LAST_PRINT = p.millis();
+    let beatInterval;
     let bpmSlider;
     let resetButton;
     let randomizeButton;
@@ -59,7 +60,8 @@ var sketch = (p) => {
             }
         }
         p.createCanvas(p.windowWidth, p.windowHeight).drop(fileHandle);
-        p.frameRate(BEAT_PER_SEC * 64);
+        p.frameRate(BEAT_PER_SEC);
+        beatInterval = setInterval(step, MILLIS_PER_BEAT);
     };
     p.windowResized = () => {
         p.resizeCanvas(p.windowWidth, p.windowHeight);
@@ -67,17 +69,10 @@ var sketch = (p) => {
         drawInfo = true;
     };
     p.draw = () => {
-        if (drawFullSeq) {
-            drawFullSeq = false;
-            SEQUENCER_ARR.forEach(seq => {
-                seq.initialDraw(p);
-            });
-        }
         if (drawInfo) {
             drawInfo = false;
             drawSliderInfo();
         }
-        handleBeat();
     };
     p.mouseClicked = (event) => {
         let coords = { x: event.pageX, y: event.pageY };
@@ -103,7 +98,7 @@ var sketch = (p) => {
         p.text(bpmSlider.value(), 440, 20);
     }
     function setupManipulators() {
-        bpmSlider = p.createSlider(60, 600, BPM, 2);
+        bpmSlider = p.createSlider(60, 960, BPM, 2);
         bpmSlider.position(35, 5);
         bpmSlider.style("width", "400px");
         bpmSlider.mouseReleased((event) => {
@@ -112,6 +107,8 @@ var sketch = (p) => {
             BEAT_PER_SEC = BPM / 60;
             p.frameRate(BEAT_PER_SEC * 10);
             drawInfo = true;
+            clearInterval(beatInterval);
+            beatInterval = setInterval(step, MILLIS_PER_BEAT);
         });
         resetButton = p.createButton("Reset");
         resetButton.position(5, 30);
@@ -138,14 +135,6 @@ var sketch = (p) => {
             });
         });
     }
-    function handleBeat() {
-        let curMillis = p.millis();
-        let timeElapsed = curMillis - LAST_PRINT;
-        if (timeElapsed > MILLIS_PER_BEAT) {
-            step();
-            LAST_PRINT = curMillis;
-        }
-    }
     function step() {
         let newStep = Object.assign({}, CURRENT_STEP);
         newStep.x++;
@@ -157,8 +146,10 @@ var sketch = (p) => {
             seq.play(newStep);
         });
         SEQUENCER_ARR.forEach(seq => {
-            seq.draw(p, CURRENT_STEP, newStep);
+            seq.draw(p, CURRENT_STEP, newStep, drawFullSeq);
         });
+        if (drawFullSeq)
+            drawFullSeq = false;
         CURRENT_STEP = newStep;
     }
     function fileHandle(file) {
@@ -213,9 +204,20 @@ class Sequencer {
         }
         this.drawFilename(p);
     }
-    draw(p, oldStep, newStep) {
+    draw(p, oldStep, newStep, fullDraw) {
         p.strokeWeight(1);
         p.stroke(1);
+        if (fullDraw) {
+            for (let y = 0; y < this.size.y; y++) {
+                for (let x = 0; x < this.size.x; x++) {
+                    let fill = 255;
+                    if (this.matrix[y][x])
+                        fill = 100;
+                    this.drawSquare(p, { x: x, y: y }, fill);
+                }
+            }
+            this.drawFilename(p);
+        }
         this.drawSquare(p, newStep, 0);
         this.drawSquare(p, oldStep, this.matrix[oldStep.y][oldStep.x] ? 100 : 255);
     }

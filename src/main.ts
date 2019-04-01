@@ -42,6 +42,8 @@ var sketch = (p: p5) => {
   let BEAT_PER_SEC = BPM / 60;
   let LAST_PRINT = p.millis();
 
+  let beatInterval: number;
+
   let bpmSlider: p5.Element;
   let resetButton: p5.Element;
   let randomizeButton: p5.Element;
@@ -85,7 +87,9 @@ var sketch = (p: p5) => {
     }
 
     p.createCanvas(p.windowWidth, p.windowHeight).drop(fileHandle);
-    p.frameRate(BEAT_PER_SEC * 64); //Aim for 64x beats per second so notes can be at most ~1/64th off
+    p.frameRate(BEAT_PER_SEC); //Refreshes on the beat interval
+
+    beatInterval = setInterval(step, MILLIS_PER_BEAT);
   };
 
   // On window resize - resize canvas and redraw
@@ -95,22 +99,11 @@ var sketch = (p: p5) => {
     drawInfo = true;
   };
 
-  // Called hopefully BPM * 2 times per second
   p.draw = () => {
-    // Makes sure the sequencers are fully drawn once, rest of the draws are simply small updates
-    if (drawFullSeq) {
-      drawFullSeq = false;
-      SEQUENCER_ARR.forEach(seq => {
-        seq.initialDraw(p);
-      });
-    }
-
     if (drawInfo) {
       drawInfo = false;
       drawSliderInfo();
     }
-
-    handleBeat();
   };
 
   // Handles the mouse click events
@@ -149,7 +142,7 @@ var sketch = (p: p5) => {
   }
 
   function setupManipulators() {
-    bpmSlider = p.createSlider(60, 600, BPM, 2);
+    bpmSlider = p.createSlider(60, 960, BPM, 2);
     bpmSlider.position(35, 5);
     bpmSlider.style("width", "400px");
 
@@ -160,6 +153,9 @@ var sketch = (p: p5) => {
 
       p.frameRate(BEAT_PER_SEC * 10);
       drawInfo = true;
+
+      clearInterval(beatInterval);
+      beatInterval = setInterval(step, MILLIS_PER_BEAT);
     });
 
     resetButton = p.createButton("Reset");
@@ -191,19 +187,6 @@ var sketch = (p: p5) => {
     });
   }
 
-  // Calls a step on an approximate BPM
-  function handleBeat(): void {
-    let curMillis = p.millis();
-    let timeElapsed = curMillis - LAST_PRINT;
-
-    //console.log(p.frameRate());
-
-    if (timeElapsed > MILLIS_PER_BEAT) {
-      step();
-      LAST_PRINT = curMillis;
-    }
-  }
-
   // Propagates a step in all the sequencers
   function step(): void {
     let newStep = { ...CURRENT_STEP };
@@ -222,8 +205,10 @@ var sketch = (p: p5) => {
 
     // Then update the view (eliminates delay between plays)
     SEQUENCER_ARR.forEach(seq => {
-      seq.draw(p, CURRENT_STEP, newStep);
+      seq.draw(p, CURRENT_STEP, newStep, drawFullSeq);
     });
+
+    if(drawFullSeq) drawFullSeq = false;
 
     CURRENT_STEP = newStep;
   }
