@@ -2,8 +2,8 @@ var sketch = (p) => {
     const DEFAULT_KIT_PATH = "audio/default-kit/";
     const DEFAULT_KIT_NAMES = [
         "snare01.wav",
-        "snare03.wav",
         "snare02.wav",
+        "snare03.wav",
         "snare04.wav",
         "clap01.wav",
         "kick01.wav",
@@ -20,45 +20,56 @@ var sketch = (p) => {
     const SOUNDS = [];
     const NUM_COLS = 5;
     const NUM_ROWS = 3;
-    const SIZE = { x: 8, y: 8 };
+    let size = { x: 8, y: 8 };
     const X_GAP = 3;
-    const Y_GAP = 3;
+    const Y_GAP = 75;
     const SQUARE_SIZE = 20;
     const PADDING = 2;
-    const SEQUENCER_DIM_SIZE_X = SIZE.x * (SQUARE_SIZE + PADDING) + SQUARE_SIZE + 2 * PADDING;
-    const SEQUENCER_DIM_SIZE_Y = SIZE.y * (SQUARE_SIZE + PADDING) + SQUARE_SIZE + 2 * PADDING + 75;
+    const SEQUENCER_DIM_SIZE_X = size.x * (SQUARE_SIZE + PADDING) + SQUARE_SIZE + 2 * PADDING;
+    const SEQUENCER_DIM_SIZE_Y = size.y * (SQUARE_SIZE + PADDING) + SQUARE_SIZE + 2 * PADDING + 75;
     let SEQUENCER_ARR = [];
     let CURRENT_STEP = { x: 0, y: 0 };
-    let inititalDrawDone = false;
+    let drawFullSeq = true;
+    let drawInfo = true;
     let BPM = 240;
-    let MILLIS_PER_BEAT = (1 / (BPM / 60)) * 1000;
+    let MILLIS_PER_BEAT = (60 / BPM) * 1000;
+    let BEAT_PER_SEC = BPM / 60;
     let LAST_PRINT = p.millis();
+    let bpmSlider;
+    let resetButton;
+    let randomizeButton;
+    let inverseButton;
     p.preload = () => {
         DEFAULT_KIT_NAMES.forEach(name => {
             SOUNDS.push({ name: name, sound: p.loadSound(DEFAULT_KIT_PATH + name) });
         });
     };
     p.setup = () => {
+        setupManipulators();
         for (let y = 0; y < NUM_ROWS; y++) {
             for (let x = 0; x < NUM_COLS; x++) {
-                let seq = new Sequencer(SIZE.x, SIZE.y, X_GAP + x * SEQUENCER_DIM_SIZE_X, Y_GAP + y * SEQUENCER_DIM_SIZE_Y, PADDING, SQUARE_SIZE);
+                let seq = new Sequencer(size.x, size.y, X_GAP + x * SEQUENCER_DIM_SIZE_X, Y_GAP + y * SEQUENCER_DIM_SIZE_Y, PADDING, SQUARE_SIZE);
                 seq.setup(p, SOUNDS[SEQUENCER_ARR.length]);
                 SEQUENCER_ARR.push(seq);
             }
         }
         p.createCanvas(p.windowWidth, p.windowHeight).drop(fileHandle);
-        p.frameRate(BPM * 2);
+        p.frameRate(BEAT_PER_SEC * 10);
     };
     p.windowResized = () => {
         p.resizeCanvas(p.windowWidth, p.windowHeight);
-        inititalDrawDone = false;
+        drawFullSeq = true;
     };
     p.draw = () => {
-        if (!inititalDrawDone) {
-            inititalDrawDone = true;
+        if (drawFullSeq) {
+            drawFullSeq = false;
             SEQUENCER_ARR.forEach(seq => {
                 seq.initialDraw(p);
             });
+        }
+        if (drawInfo) {
+            drawInfo = false;
+            drawSliderInfo();
         }
         handleBeat();
     };
@@ -75,6 +86,51 @@ var sketch = (p) => {
         }
         return SEQUENCER_ARR[seqX + seqY * NUM_COLS];
     }
+    function drawSliderInfo() {
+        p.fill(255);
+        p.stroke(255);
+        p.rect(0, 0, p.windowWidth, Y_GAP - 1);
+        p.fill(0);
+        p.textSize(12);
+        p.text("BPM", 1, 20);
+        p.text(bpmSlider.value(), 440, 20);
+    }
+    function setupManipulators() {
+        bpmSlider = p.createSlider(60, 600, BPM, 2);
+        bpmSlider.position(35, 5);
+        bpmSlider.style("width", "400px");
+        bpmSlider.mouseReleased((event) => {
+            BPM = bpmSlider.value();
+            MILLIS_PER_BEAT = (60 / BPM) * 1000;
+            BEAT_PER_SEC = BPM / 60;
+            p.frameRate(BEAT_PER_SEC * 10);
+            drawInfo = true;
+        });
+        resetButton = p.createButton('Reset');
+        resetButton.position(5, 30);
+        resetButton.mousePressed((event) => {
+            CURRENT_STEP = { x: 0, y: 0 };
+            drawFullSeq = true;
+            LAST_PRINT = p.millis();
+            SEQUENCER_ARR.forEach(seq => {
+                seq.reset(p);
+            });
+        });
+        randomizeButton = p.createButton('Randomize');
+        randomizeButton.position(70, 30);
+        randomizeButton.mousePressed((event) => {
+            SEQUENCER_ARR.forEach(seq => {
+                seq.randomize(p);
+            });
+        });
+        inverseButton = p.createButton('Inverse');
+        inverseButton.position(170, 30);
+        inverseButton.mousePressed((event) => {
+            SEQUENCER_ARR.forEach(seq => {
+                seq.inverse(p);
+            });
+        });
+    }
     function handleBeat() {
         let curMillis = p.millis();
         let timeElapsed = curMillis - LAST_PRINT;
@@ -86,9 +142,9 @@ var sketch = (p) => {
     function step() {
         let newStep = Object.assign({}, CURRENT_STEP);
         newStep.x++;
-        if (newStep.x >= SIZE.x) {
+        if (newStep.x >= size.x) {
             newStep.x = 0;
-            newStep.y = (newStep.y + 1) % SIZE.y;
+            newStep.y = (newStep.y + 1) % size.y;
         }
         SEQUENCER_ARR.forEach(seq => {
             seq.play(newStep);
@@ -142,7 +198,10 @@ class Sequencer {
         p.stroke(1);
         for (let y = 0; y < this.size.y; y++) {
             for (let x = 0; x < this.size.x; x++) {
-                this.drawSquare(p, { x: x, y: y }, 255);
+                let fill = 255;
+                if (this.matrix[y][x])
+                    fill = 100;
+                this.drawSquare(p, { x: x, y: y }, fill);
             }
         }
         this.drawFilename(p);
@@ -195,6 +254,35 @@ class Sequencer {
     play(grid) {
         if (this.matrix[grid.y][grid.x] && this.sound != null)
             this.sound.play();
+    }
+    reset(p) {
+        for (let y = 0; y < this.size.y; y++) {
+            for (let x = 0; x < this.size.x; x++) {
+                this.matrix[y][x] = false;
+                this.drawSquare(p, { x, y }, 255);
+            }
+        }
+    }
+    randomize(p) {
+        for (let y = 0; y < this.size.y; y++) {
+            for (let x = 0; x < this.size.x; x++) {
+                if (Math.random() < 0.3) {
+                    this.matrix[y][x] = true;
+                    this.drawSquare(p, { x, y }, 100);
+                }
+                else {
+                    this.matrix[y][x] = false;
+                    this.drawSquare(p, { x, y }, 255);
+                }
+            }
+        }
+    }
+    inverse(p) {
+        for (let y = 0; y < this.size.y; y++) {
+            for (let x = 0; x < this.size.x; x++) {
+                this.drawSquare(p, { x, y }, this.toggle({ x, y }) ? 100 : 255);
+            }
+        }
     }
     setupSliders(p) {
         let sliderWidth = this.size.x * (this.squareSize - this.padding);
