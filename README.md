@@ -12,11 +12,13 @@ Demo can be seen [here](https://erikburt.github.io/TSequencer/).
 
 ### Install
 `git clone https://github.com/erikburt/TSequencer.git`
+
 `npm i`
 
 ### Usage
 `npm start`
-Open your web browser and go to [localhost:3000](localhost:3000).
+
+Open your web browser and go to [localhost:3000](http://localhost:3000/).
 
 ### Credit
  - [Boilerplate](https://github.com/Gaweph/p5-typescript-starter)
