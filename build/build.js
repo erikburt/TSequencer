@@ -3,19 +3,19 @@ var sketch = (p) => {
     const DEFAULT_KIT_NAMES = [
         "snare01.wav",
         "snare02.wav",
-        "snare03.wav",
-        "snare04.wav",
-        "clap01.wav",
+        "tom01.wav",
+        "tom02.wav",
+        "tom03.wav",
         "kick01.wav",
         "kick02.wav",
         "openhat01.wav",
         "openhat02.wav",
-        "openhat03.wav",
-        "clap02.wav",
+        "clap01.wav",
         "closedhat01.wav",
-        "closedhat03.wav",
         "closedhat02.wav",
-        "closedhat04.wav"
+        "clap02.wav",
+        "laser.wav",
+        "drop.wav"
     ];
     const SOUNDS = [];
     const NUM_COLS = 5;
@@ -41,20 +41,25 @@ var sketch = (p) => {
     let inverseButton;
     p.preload = () => {
         DEFAULT_KIT_NAMES.forEach(name => {
-            SOUNDS.push({ name: name, sound: p.loadSound(DEFAULT_KIT_PATH + name) });
+            p.loadSound(DEFAULT_KIT_PATH + name, (sound) => {
+                let name = sound.file.split("/")[2];
+                SOUNDS.push({ name, sound });
+            });
         });
     };
     p.setup = () => {
         setupManipulators();
+        let drumNumber = 0;
         for (let y = 0; y < NUM_ROWS; y++) {
             for (let x = 0; x < NUM_COLS; x++) {
                 let seq = new Sequencer(size.x, size.y, X_GAP + x * SEQUENCER_DIM_SIZE_X, Y_GAP + y * SEQUENCER_DIM_SIZE_Y, PADDING, SQUARE_SIZE);
-                seq.setup(p, SOUNDS[SEQUENCER_ARR.length]);
+                let drum = SOUNDS[drumNumber++ % SOUNDS.length];
+                seq.setup(p, drum);
                 SEQUENCER_ARR.push(seq);
             }
         }
         p.createCanvas(p.windowWidth, p.windowHeight).drop(fileHandle);
-        p.frameRate(BEAT_PER_SEC * 10);
+        p.frameRate(BEAT_PER_SEC * 64);
     };
     p.windowResized = () => {
         p.resizeCanvas(p.windowWidth, p.windowHeight);

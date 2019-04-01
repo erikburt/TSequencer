@@ -3,19 +3,19 @@ var sketch = (p: p5) => {
   const DEFAULT_KIT_NAMES = [
     "snare01.wav",
     "snare02.wav",
-    "snare03.wav",
-    "snare04.wav",
-    "clap01.wav",
+    "tom01.wav",
+    "tom02.wav",
+    "tom03.wav",
     "kick01.wav",
     "kick02.wav",
     "openhat01.wav",
     "openhat02.wav",
-    "openhat03.wav",
-    "clap02.wav",
+    "clap01.wav",
     "closedhat01.wav",
-    "closedhat03.wav",
     "closedhat02.wav",
-    "closedhat04.wav"
+    "clap02.wav",
+    "laser.wav",
+    "drop.wav"
   ];
   const SOUNDS: { name: string; sound: p5.SoundFile }[] = [];
 
@@ -51,13 +51,19 @@ var sketch = (p: p5) => {
   p.preload = () => {
     DEFAULT_KIT_NAMES.forEach(name => {
       // @ts-ignore: Load Sound does not exist on type p5
-      SOUNDS.push({ name: name, sound: p.loadSound(DEFAULT_KIT_PATH + name) });
+      p.loadSound(DEFAULT_KIT_PATH + name, (sound: p5.SoundFile) => {
+        // @ts-ignore: Filedoes not exist on type SoundFile
+        let name = sound.file.split("/")[2];
+        SOUNDS.push({ name, sound });
+      });
     });
   };
 
   // Setup function, called implictly by p5
   p.setup = () => {
     setupManipulators();
+
+    let drumNumber = 0;
 
     for (let y = 0; y < NUM_ROWS; y++) {
       for (let x = 0; x < NUM_COLS; x++) {
@@ -71,13 +77,15 @@ var sketch = (p: p5) => {
           SQUARE_SIZE
         );
 
-        seq.setup(p, SOUNDS[SEQUENCER_ARR.length]);
+        let drum = SOUNDS[drumNumber++ % SOUNDS.length];
+
+        seq.setup(p, drum);
         SEQUENCER_ARR.push(seq);
       }
     }
 
     p.createCanvas(p.windowWidth, p.windowHeight).drop(fileHandle);
-    p.frameRate(BEAT_PER_SEC * 10); //Aim for 10x beats per second
+    p.frameRate(BEAT_PER_SEC * 64); //Aim for 64x beats per second so notes can be at most ~1/64th off
   };
 
   // On window resize - resize canvas and redraw
@@ -107,7 +115,7 @@ var sketch = (p: p5) => {
 
   // Handles the mouse click events
   p.mouseClicked = (event: MouseEvent) => {
-    let coords = {x: event.pageX, y: event.pageY};
+    let coords = { x: event.pageX, y: event.pageY };
 
     let seq = getSequencerFromCoord(coords);
     if (seq) seq.mouseClicked(p, coords);
