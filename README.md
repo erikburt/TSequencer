@@ -7,5 +7,5 @@ A web based music sequencer written in [typescript](https://www.typescriptlang.o
 `npm start`
 
 ### Credit
- - [Boilerplate](git clone https://github.com/Gaweph/p5-typescript-starter.git)
+ - [Boilerplate](https://github.com/Gaweph/p5-typescript-starter.git)
  - [Drum Samples](https://www.musicradar.com/news/drums/sampleradar-1000-free-drum-samples-229460)
