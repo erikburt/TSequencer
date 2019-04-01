@@ -59,6 +59,7 @@ var sketch = (p) => {
     p.windowResized = () => {
         p.resizeCanvas(p.windowWidth, p.windowHeight);
         drawFullSeq = true;
+        drawInfo = true;
     };
     p.draw = () => {
         if (drawFullSeq) {
@@ -73,7 +74,8 @@ var sketch = (p) => {
         }
         handleBeat();
     };
-    p.mouseClicked = (coords) => {
+    p.mouseClicked = (event) => {
+        let coords = { x: event.pageX, y: event.pageY };
         let seq = getSequencerFromCoord(coords);
         if (seq)
             seq.mouseClicked(p, coords);
@@ -106,7 +108,7 @@ var sketch = (p) => {
             p.frameRate(BEAT_PER_SEC * 10);
             drawInfo = true;
         });
-        resetButton = p.createButton('Reset');
+        resetButton = p.createButton("Reset");
         resetButton.position(5, 30);
         resetButton.mousePressed((event) => {
             CURRENT_STEP = { x: 0, y: 0 };
@@ -116,14 +118,14 @@ var sketch = (p) => {
                 seq.reset(p);
             });
         });
-        randomizeButton = p.createButton('Randomize');
+        randomizeButton = p.createButton("Randomize");
         randomizeButton.position(70, 30);
         randomizeButton.mousePressed((event) => {
             SEQUENCER_ARR.forEach(seq => {
                 seq.randomize(p);
             });
         });
-        inverseButton = p.createButton('Inverse');
+        inverseButton = p.createButton("Inverse");
         inverseButton.position(170, 30);
         inverseButton.mousePressed((event) => {
             SEQUENCER_ARR.forEach(seq => {

@@ -84,6 +84,7 @@ var sketch = (p: p5) => {
   p.windowResized = () => {
     p.resizeCanvas(p.windowWidth, p.windowHeight);
     drawFullSeq = true;
+    drawInfo = true;
   };
 
   // Called hopefully BPM * 2 times per second
@@ -105,7 +106,9 @@ var sketch = (p: p5) => {
   };
 
   // Handles the mouse click events
-  p.mouseClicked = (coords: IPoint) => {
+  p.mouseClicked = (event: MouseEvent) => {
+    let coords = {x: event.pageX, y: event.pageY};
+
     let seq = getSequencerFromCoord(coords);
     if (seq) seq.mouseClicked(p, coords);
   };
@@ -147,14 +150,14 @@ var sketch = (p: p5) => {
       MILLIS_PER_BEAT = (60 / BPM) * 1000;
       BEAT_PER_SEC = BPM / 60;
 
-      p.frameRate(BEAT_PER_SEC*10);
+      p.frameRate(BEAT_PER_SEC * 10);
       drawInfo = true;
     });
 
-    resetButton = p.createButton('Reset');
+    resetButton = p.createButton("Reset");
     resetButton.position(5, 30);
     resetButton.mousePressed((event: MouseEvent) => {
-      CURRENT_STEP = { x: 0, y: 0 }
+      CURRENT_STEP = { x: 0, y: 0 };
       drawFullSeq = true;
       LAST_PRINT = p.millis();
 
@@ -163,7 +166,7 @@ var sketch = (p: p5) => {
       });
     });
 
-    randomizeButton = p.createButton('Randomize');
+    randomizeButton = p.createButton("Randomize");
     randomizeButton.position(70, 30);
     randomizeButton.mousePressed((event: MouseEvent) => {
       SEQUENCER_ARR.forEach(seq => {
@@ -171,7 +174,7 @@ var sketch = (p: p5) => {
       });
     });
 
-    inverseButton = p.createButton('Inverse');
+    inverseButton = p.createButton("Inverse");
     inverseButton.position(170, 30);
     inverseButton.mousePressed((event: MouseEvent) => {
       SEQUENCER_ARR.forEach(seq => {
