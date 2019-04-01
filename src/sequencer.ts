@@ -82,7 +82,11 @@ class Sequencer implements ISequencer {
 
     for (let y = 0; y < this.size.y; y++) {
       for (let x = 0; x < this.size.x; x++) {
-        this.drawSquare(p, { x: x, y: y }, 255);
+        let fill = 255;
+
+        if(this.matrix[y][x]) fill = 100;
+
+        this.drawSquare(p, { x: x, y: y }, fill);
       }
     }
 
@@ -176,6 +180,39 @@ class Sequencer implements ISequencer {
   // Plays the associated sound if enabled and sound exists
   play(grid: IPoint): void {
     if (this.matrix[grid.y][grid.x] && this.sound != null) this.sound.play();
+  }
+
+  // Resets all the matrix
+  reset(p: p5): void {
+    for(let y=0; y<this.size.y; y++) {
+      for(let x=0; x<this.size.x; x++) {
+        this.matrix[y][x] = false;
+        this.drawSquare(p, {x, y}, 255);
+      }
+    }
+  }
+
+  randomize(p: p5): void {
+    for(let y=0; y<this.size.y; y++) {
+      for(let x=0; x<this.size.x; x++) {
+        if(Math.random() < 0.3) {
+          this.matrix[y][x] = true;
+          this.drawSquare(p, {x, y}, 100);
+        }
+        else {
+          this.matrix[y][x] = false;
+          this.drawSquare(p, {x, y}, 255);
+        }
+      }
+    }
+  }
+
+  inverse(p: p5): void {
+    for(let y=0; y<this.size.y; y++) {
+      for(let x=0; x<this.size.x; x++) {
+        this.drawSquare(p, {x,y}, this.toggle({x, y}) ? 100 : 255);        
+      }
+    }
   }
 
   // Initializes sliders and event handlers

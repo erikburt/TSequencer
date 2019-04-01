@@ -2,8 +2,8 @@ var sketch = (p: p5) => {
   const DEFAULT_KIT_PATH = "audio/default-kit/";
   const DEFAULT_KIT_NAMES = [
     "snare01.wav",
-    "snare03.wav",
     "snare02.wav",
+    "snare03.wav",
     "snare04.wav",
     "clap01.wav",
     "kick01.wav",
@@ -22,23 +22,30 @@ var sketch = (p: p5) => {
   const NUM_COLS = 5;
   const NUM_ROWS = 3;
 
-  const SIZE: IPoint = { x: 8, y: 8 }; // Grid size of sequencer
+  let size: IPoint = { x: 8, y: 8 }; // Grid size of sequencer
   const X_GAP = 3; // Initial gap from left side of window to first line
-  const Y_GAP = 3; // Initial gap from top side of window to first line
+  const Y_GAP = 75; // Initial gap from top side of window to first line
   const SQUARE_SIZE = 20; // Side size of individual squares
   const PADDING = 2; // Padding between individual squares
   const SEQUENCER_DIM_SIZE_X = // The amount of room one sequencer takes up on the x axis
-    SIZE.x * (SQUARE_SIZE + PADDING) + SQUARE_SIZE + 2 * PADDING;
+    size.x * (SQUARE_SIZE + PADDING) + SQUARE_SIZE + 2 * PADDING;
   const SEQUENCER_DIM_SIZE_Y = // The amount of room one sequencer takes up on the y axis
-    SIZE.y * (SQUARE_SIZE + PADDING) + SQUARE_SIZE + 2 * PADDING + 75;
+    size.y * (SQUARE_SIZE + PADDING) + SQUARE_SIZE + 2 * PADDING + 75;
 
   let SEQUENCER_ARR: Sequencer[] = []; // Stores all the sequencers
   let CURRENT_STEP: IPoint = { x: 0, y: 0 }; //Maintains the current step of all the sequencers
-  let inititalDrawDone = false;
+  let drawFullSeq = true;
+  let drawInfo = true;
 
   let BPM = 240;
-  let MILLIS_PER_BEAT = (1 / (BPM / 60)) * 1000;
+  let MILLIS_PER_BEAT = (60 / BPM) * 1000;
+  let BEAT_PER_SEC = BPM / 60;
   let LAST_PRINT = p.millis();
+
+  let bpmSlider: p5.Element;
+  let resetButton: p5.Element;
+  let randomizeButton: p5.Element;
+  let inverseButton: p5.Element;
 
   // The initial loading of all the default sounds, called before setup
   p.preload = () => {
@@ -50,12 +57,14 @@ var sketch = (p: p5) => {
 
   // Setup function, called implictly by p5
   p.setup = () => {
+    setupManipulators();
+
     for (let y = 0; y < NUM_ROWS; y++) {
       for (let x = 0; x < NUM_COLS; x++) {
         //Instantiate a new sequencer
         let seq = new Sequencer(
-          SIZE.x,
-          SIZE.y,
+          size.x,
+          size.y,
           X_GAP + x * SEQUENCER_DIM_SIZE_X,
           Y_GAP + y * SEQUENCER_DIM_SIZE_Y,
           PADDING,
@@ -68,24 +77,28 @@ var sketch = (p: p5) => {
     }
 
     p.createCanvas(p.windowWidth, p.windowHeight).drop(fileHandle);
-    p.frameRate(BPM * 2); //Aim for 2x BPM
+    p.frameRate(BEAT_PER_SEC * 10); //Aim for 10x beats per second
   };
 
   // On window resize - resize canvas and redraw
   p.windowResized = () => {
     p.resizeCanvas(p.windowWidth, p.windowHeight);
-    inititalDrawDone = false;
+    drawFullSeq = true;
   };
 
   // Called hopefully BPM * 2 times per second
   p.draw = () => {
     // Makes sure the sequencers are fully drawn once, rest of the draws are simply small updates
-    if (!inititalDrawDone) {
-      inititalDrawDone = true;
-
+    if (drawFullSeq) {
+      drawFullSeq = false;
       SEQUENCER_ARR.forEach(seq => {
         seq.initialDraw(p);
       });
+    }
+
+    if (drawInfo) {
+      drawInfo = false;
+      drawSliderInfo();
     }
 
     handleBeat();
@@ -109,10 +122,70 @@ var sketch = (p: p5) => {
     return SEQUENCER_ARR[seqX + seqY * NUM_COLS];
   }
 
+  function drawSliderInfo() {
+    p.fill(255);
+    p.stroke(255);
+    p.rect(0, 0, p.windowWidth, Y_GAP - 1);
+
+    p.fill(0);
+    p.textSize(12);
+
+    p.text("BPM", 1, 20);
+    p.text(bpmSlider.value(), 440, 20);
+
+    //p.text("Rows", 1, 50);
+    //p.text(rowSlider.value(), 240, 50);
+  }
+
+  function setupManipulators() {
+    bpmSlider = p.createSlider(60, 600, BPM, 2);
+    bpmSlider.position(35, 5);
+    bpmSlider.style("width", "400px");
+
+    bpmSlider.mouseReleased((event: MouseEvent) => {
+      BPM = bpmSlider.value();
+      MILLIS_PER_BEAT = (60 / BPM) * 1000;
+      BEAT_PER_SEC = BPM / 60;
+
+      p.frameRate(BEAT_PER_SEC*10);
+      drawInfo = true;
+    });
+
+    resetButton = p.createButton('Reset');
+    resetButton.position(5, 30);
+    resetButton.mousePressed((event: MouseEvent) => {
+      CURRENT_STEP = { x: 0, y: 0 }
+      drawFullSeq = true;
+      LAST_PRINT = p.millis();
+
+      SEQUENCER_ARR.forEach(seq => {
+        seq.reset(p);
+      });
+    });
+
+    randomizeButton = p.createButton('Randomize');
+    randomizeButton.position(70, 30);
+    randomizeButton.mousePressed((event: MouseEvent) => {
+      SEQUENCER_ARR.forEach(seq => {
+        seq.randomize(p);
+      });
+    });
+
+    inverseButton = p.createButton('Inverse');
+    inverseButton.position(170, 30);
+    inverseButton.mousePressed((event: MouseEvent) => {
+      SEQUENCER_ARR.forEach(seq => {
+        seq.inverse(p);
+      });
+    });
+  }
+
   // Calls a step on an approximate BPM
   function handleBeat(): void {
     let curMillis = p.millis();
     let timeElapsed = curMillis - LAST_PRINT;
+
+    //console.log(p.frameRate());
 
     if (timeElapsed > MILLIS_PER_BEAT) {
       step();
@@ -125,9 +198,9 @@ var sketch = (p: p5) => {
     let newStep = { ...CURRENT_STEP };
     newStep.x++;
 
-    if (newStep.x >= SIZE.x) {
+    if (newStep.x >= size.x) {
       newStep.x = 0;
-      newStep.y = (newStep.y + 1) % SIZE.y;
+      newStep.y = (newStep.y + 1) % size.y;
     }
 
     // Play all enabled sounds
