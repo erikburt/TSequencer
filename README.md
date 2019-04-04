@@ -16,6 +16,7 @@ A web based music sequencer written in [typescript](https://www.typescriptlang.o
 - Patterned "randomness"
 - Settings to modulate BPM to non-linear
 - Loudness per activation
+- Import/Export of webpage state
 - ...
 
 ## Demo
