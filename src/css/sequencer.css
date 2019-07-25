@@ -13,3 +13,27 @@ div.sequencer {
 div.seqActive {
   background: red;
 }
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: black;
+  cursor: pointer;
+}
+
+.slider:hover {
+  opacity: 1;
+}

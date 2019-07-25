@@ -2,10 +2,18 @@ class AudioBufferWrapper {
   audioContext: AudioContext;
   filename: string;
   buffer: AudioBuffer | null = null;
+  gainNode: GainNode;
+  panNode: StereoPannerNode;
 
   constructor(audioContext: AudioContext, audioUrl: string) {
     this.audioContext = audioContext;
     this.filename = audioUrl.split("/").slice(-1)[0];
+
+    this.gainNode = audioContext.createGain();
+    this.panNode = audioContext.createStereoPanner();
+
+    this.panNode.connect(this.gainNode);
+    this.gainNode.connect(audioContext.destination);
 
     this.loadSound(audioUrl);
   }
@@ -30,14 +38,17 @@ class AudioBufferWrapper {
     request.send();
   }
 
-  play(): void {
+  play(volume: number, pan: number): void {
     if (this.buffer == null)
       console.error(`Buffer is null for ${this.filename}`);
+
+    this.gainNode.gain.value = volume / 100;
+    this.panNode.pan.value = pan;
 
     //TODO: Prepare a source node for play after one is played for the next iteration. To reduce latency when playing
     let source = this.audioContext.createBufferSource();
     source.buffer = this.buffer;
-    source.connect(this.audioContext.destination);
+    source.connect(this.panNode);
     source.start(0);
   }
 }

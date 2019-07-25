@@ -17,6 +17,8 @@ export interface SequencerState {
   steps: boolean[];
   toPlay: boolean;
   prevStep: number;
+  volume: number;
+  pan: number;
 
   /*
   audioFile: ...
@@ -36,7 +38,9 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
       numSteps,
       steps,
       toPlay: false,
-      prevStep: this.props.step
+      prevStep: this.props.step,
+      volume: 100,
+      pan: 0
     };
 
     this.toggle = this.toggle.bind(this);
@@ -48,6 +52,16 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
     this.setState({ steps });
   };
 
+  volumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const volume = parseInt(e.currentTarget.value) || 100;
+    this.setState({ volume });
+  };
+
+  panChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const pan = parseFloat(e.currentTarget.value) || 0;
+    this.setState({ pan });
+  };
+
   render() {
     let className = "sequencer";
 
@@ -57,7 +71,7 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
     ) {
       className = "seqActive";
       this.setState({ prevStep: this.props.step });
-      this.props.audio.play();
+      this.props.audio.play(this.state.volume, this.state.pan);
     }
 
     return (
@@ -70,8 +84,26 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
             toggleFunc={this.toggle}
           />
         ))}
-        {/* <h1>{this.props.audio.title}</h1> */}
         <span>{this.props.audio.filename}</span>
+        <input
+          className="slider"
+          type="range"
+          min="1"
+          max="100"
+          defaultValue="100"
+          id="volumeSlider"
+          onInput={this.volumeChange}
+        />
+        <input
+          className="slider"
+          type="range"
+          step=".1"
+          min="-1"
+          max="1"
+          defaultValue="0"
+          id="panSlider"
+          onChange={this.panChange}
+        />
       </div>
     );
   }
