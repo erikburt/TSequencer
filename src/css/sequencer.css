@@ -1,0 +1,15 @@
+div.seqActive,
+div.sequencer {
+  margin: 7px;
+  padding: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  float: left;
+  width: 145px;
+}
+
+div.seqActive {
+  background: red;
+}
