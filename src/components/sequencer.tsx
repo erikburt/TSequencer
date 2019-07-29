@@ -1,8 +1,8 @@
-import * as React from "react";
-import { Component } from "react";
-import Step from "./step";
-import "../css/sequencer.css";
-import AudioBufferWrapper from "../tools/audioBufferWrapper";
+import * as React from 'react';
+import { Component } from 'react';
+import Step from './step';
+import '../css/sequencer.css';
+import AudioBufferWrapper from '../tools/audioBufferWrapper';
 
 export interface SequencerProps {
   id: number;
@@ -19,11 +19,6 @@ export interface SequencerState {
   prevStep: number;
   volume: number;
   pan: number;
-
-  /*
-  audioFile: ...
-  pan
-   */
 }
 
 class Sequencer extends React.Component<SequencerProps, SequencerState> {
@@ -62,20 +57,39 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
     this.setState({ pan });
   };
 
+  handleDragOver = (e: React.DragEvent<HTMLInputElement>) => {
+    e.preventDefault();
+  };
+
+  handleDrop = (e: React.DragEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.dataTransfer.files) {
+      //TODO: Handle the rest of the files
+      const file: File = e.dataTransfer.files[0];
+      this.props.audio.updateSoundWithFile(file);
+    }
+  };
+
   render() {
-    let className = "sequencer";
+    let className = 'sequencer';
 
     if (
       this.state.steps[this.props.step] &&
       this.props.step !== this.state.prevStep
     ) {
-      className = "seqActive";
+      className = 'seqActive';
       this.setState({ prevStep: this.props.step });
       this.props.audio.play(this.state.volume, this.state.pan);
     }
 
     return (
-      <div className={className}>
+      <div
+        className={className}
+        onDragOver={this.handleDragOver}
+        onDrop={this.handleDrop}
+      >
         {this.state.steps.map((step, index) => (
           <Step
             key={`${this.props.id}${index}`}
@@ -84,26 +98,28 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
             toggleFunc={this.toggle}
           />
         ))}
-        <span>{this.props.audio.filename}</span>
-        <input
-          className="slider"
-          type="range"
-          min="1"
-          max="100"
-          defaultValue="100"
-          id="volumeSlider"
-          onInput={this.volumeChange}
-        />
-        <input
-          className="slider"
-          type="range"
-          step=".1"
-          min="-1"
-          max="1"
-          defaultValue="0"
-          id="panSlider"
-          onChange={this.panChange}
-        />
+        <div>
+          <span>{this.props.audio.filename}</span>
+          <input
+            className="slider"
+            type="range"
+            min="1"
+            max="100"
+            defaultValue="100"
+            id="volumeSlider"
+            onInput={this.volumeChange}
+          />
+          <input
+            className="slider"
+            type="range"
+            step=".1"
+            min="-1"
+            max="1"
+            defaultValue="0"
+            id="panSlider"
+            onChange={this.panChange}
+          />
+        </div>
       </div>
     );
   }

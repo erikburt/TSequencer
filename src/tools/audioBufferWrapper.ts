@@ -7,7 +7,7 @@ class AudioBufferWrapper {
 
   constructor(audioContext: AudioContext, audioUrl: string) {
     this.audioContext = audioContext;
-    this.filename = audioUrl.split("/").slice(-1)[0];
+    this.filename = audioUrl.split('/').slice(-1)[0];
 
     this.gainNode = audioContext.createGain();
     this.panNode = audioContext.createStereoPanner();
@@ -15,13 +15,13 @@ class AudioBufferWrapper {
     this.panNode.connect(this.gainNode);
     this.gainNode.connect(audioContext.destination);
 
-    this.loadSound(audioUrl);
+    this.loadSoundByHttp(audioUrl);
   }
 
-  loadSound(audioUrl: string): void {
+  loadSoundByHttp(audioUrl: string): void {
     let request = new XMLHttpRequest();
-    request.open("GET", audioUrl, true);
-    request.responseType = "arraybuffer";
+    request.open('GET', audioUrl, true);
+    request.responseType = 'arraybuffer';
 
     request.onload = async () => {
       let audio = request.response;
@@ -36,6 +36,27 @@ class AudioBufferWrapper {
     };
 
     request.send();
+  }
+
+  updateSoundWithFile(file: File) {
+    if (!file.name.endsWith('.wav')) return;
+
+    const fr = new FileReader();
+
+    fr.onload = async () => {
+      const data = fr.result as ArrayBuffer;
+
+      try {
+        this.buffer = await this.audioContext.decodeAudioData(data);
+        this.filename = file.name;
+      } catch (e) {
+        console.error(
+          `Error with decoding audio from ${file.name}, ${e.message}`
+        );
+      }
+    };
+
+    fr.readAsArrayBuffer(file);
   }
 
   play(volume: number, pan: number): void {
