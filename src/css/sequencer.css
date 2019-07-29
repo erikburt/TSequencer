@@ -14,9 +14,9 @@ div.seqActive {
   background: red;
 }
 
+.bpmslider,
 .slider {
   -webkit-appearance: none;
-  width: 100%;
   height: 10px;
   background: #d3d3d3;
   outline: none;
@@ -25,6 +25,7 @@ div.seqActive {
   transition: opacity 0.2s;
 }
 
+.bpmslider::-webkit-slider-thumb,
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -34,6 +35,17 @@ div.seqActive {
   cursor: pointer;
 }
 
+.bpmslider::hover,
 .slider:hover {
   opacity: 1;
+}
+
+.bpmslider {
+  width: 90%;
+  margin: 10px;
+  text-align: center;
+}
+
+.slider {
+  width: 100%;
 }
