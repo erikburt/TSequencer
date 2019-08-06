@@ -9,14 +9,14 @@ A web based music sequencer written in [typescript](https://www.typescriptlang.o
 
 ### Todo
 
-[x] Refactor to react front-end
-[] Variable amount of sequencers
-[] A drop down menu per sequencer to choose default and uploaded sounds
-[] Configurable column/row count on sequencers
-[] Patterned "randomness"
-[] Settings to modulate BPM to non-linear
-[] Loudness per activation
-[] Import/Export of sequencer states (saving)
+- [x] Refactor to react front-end
+- [ ] Variable amount of sequencers
+- [ ] A drop down menu per sequencer to choose default and uploaded sounds
+- [ ] Configurable column/row count on sequencers
+- [ ] Patterned "randomness"
+- [ ] Settings to modulate BPM to non-linear
+- [ ] Loudness per activation
+- [ ] Import/Export of sequencer states (saving)
 
 ## Demo
 
