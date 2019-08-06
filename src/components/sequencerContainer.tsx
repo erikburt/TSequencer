@@ -1,25 +1,24 @@
-import * as React from 'react';
-import { Component } from 'react';
-import Sequencer from './sequencer';
-import AudioBufferWrapper from '../tools/audioBufferWrapper';
-import { tsImportEqualsDeclaration } from '@babel/types';
+import * as React from "react";
+import { Component } from "react";
+import Sequencer from "./sequencer";
+import AudioBufferWrapper from "../tools/audioBufferWrapper";
 
 const AUDIO_ARRAY = [
-  'clap01.wav',
-  'clap02.wav',
-  'closedhat01.wav',
-  'closedhat02.wav',
-  'drop.wav',
-  'kick01.wav',
-  'kick02.wav',
-  'laser.wav',
-  'openhat01.wav',
-  'openhat02.wav',
-  'snare01.wav',
-  'snare02.wav',
-  'tom01.wav',
-  'tom02.wav',
-  'tom03.wav'
+  "clap01.wav",
+  "clap02.wav",
+  "closedhat01.wav",
+  "closedhat02.wav",
+  "drop.wav",
+  "kick01.wav",
+  "kick02.wav",
+  "laser.wav",
+  "openhat01.wav",
+  "openhat02.wav",
+  "snare01.wav",
+  "snare02.wav",
+  "tom01.wav",
+  "tom02.wav",
+  "tom03.wav"
 ];
 
 export interface SequencerContainerProps {
@@ -39,6 +38,8 @@ class SequencerContainer extends React.Component<
   SequencerContainerProps,
   SequencerContainerState
 > {
+  static readonly NUM_STEPS = 64;
+
   timer: number = 0;
 
   constructor(props: SequencerContainerProps) {
@@ -57,12 +58,10 @@ class SequencerContainer extends React.Component<
       audioRefs,
       bpm
     };
-
-    // this.handleDrop = this.handleDrop.bind(this);
   }
 
   tick() {
-    const step = (this.state.step + 1) % 64;
+    const step = (this.state.step + 1) % SequencerContainer.NUM_STEPS;
 
     this.setState({
       step
