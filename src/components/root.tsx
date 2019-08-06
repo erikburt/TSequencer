@@ -11,11 +11,14 @@ export interface RootState {
 }
 
 class Root extends React.Component<RootProps, RootState> {
+  static readonly DEFAULT_BPM = 120;
+  static readonly NUM_SEQUENCERS = 15;
+
   constructor(props: RootProps) {
     super(props);
 
     this.state = {
-      bpm: 120,
+      bpm: Root.DEFAULT_BPM,
       audioContext: new AudioContext()
     };
 
@@ -45,7 +48,7 @@ class Root extends React.Component<RootProps, RootState> {
         <SequencerContainer
           key="SequencerContainer"
           bpm={this.state.bpm}
-          numSequencers={15}
+          numSequencers={Root.NUM_SEQUENCERS}
           audioContext={this.state.audioContext}
         />
       </div>
