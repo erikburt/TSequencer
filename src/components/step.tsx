@@ -4,10 +4,8 @@ import "../css/step.css";
 
 export interface StepProps {
   id: number;
-  // testID: number;
   step: number;
   toggleFunc: (id: number, activated: boolean) => void;
-  // activated: boolean;
 }
 
 export interface StepState {
