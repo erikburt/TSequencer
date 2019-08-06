@@ -103,8 +103,7 @@ class SequencerContainer extends React.Component<
         <Sequencer
           key={i}
           id={i}
-          stepHeight={8}
-          stepWidth={8}
+          numSteps={SequencerContainer.NUM_STEPS}
           step={this.state.step}
           audio={audio}
         />

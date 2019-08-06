@@ -6,14 +6,12 @@ import AudioBufferWrapper from "../tools/audioBufferWrapper";
 
 export interface SequencerProps {
   id: number;
-  stepHeight: number;
-  stepWidth: number;
   step: number;
+  numSteps: number;
   audio: AudioBufferWrapper;
 }
 
 export interface SequencerState {
-  numSteps: number;
   steps: boolean[];
   toPlay: boolean;
   prevStep: number;
@@ -28,12 +26,9 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
   constructor(props: SequencerProps) {
     super(props);
 
-    const { stepHeight, stepWidth } = props;
-    const numSteps = stepHeight * stepWidth;
-    const steps = new Array(numSteps).fill(false);
+    const steps = new Array(props.numSteps).fill(false);
 
     this.state = {
-      numSteps,
       steps,
       toPlay: false,
       prevStep: this.props.step,
