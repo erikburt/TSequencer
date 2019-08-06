@@ -1,17 +1,17 @@
-import React from 'react';
-import { Component } from 'react';
-import SequencerContainer from './components/sequencerContainer';
-import './css/App.css';
+import React from "react";
+import { Component } from "react";
+import SequencerContainer from "./sequencerContainer";
+import "../css/root.css";
 
-export interface AppProps {}
+export interface RootProps {}
 
-export interface AppState {
+export interface RootState {
   audioContext: AudioContext;
   bpm: number;
 }
 
-class App extends React.Component<AppProps, AppState> {
-  constructor(props: AppProps) {
+class Root extends React.Component<RootProps, RootState> {
+  constructor(props: RootProps) {
     super(props);
 
     this.state = {
@@ -31,7 +31,7 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div>
         <div>
-          {this.state.bpm + 'bpm'}
+          {this.state.bpm + "bpm"}
           <input
             className="bpmslider"
             type="range"
@@ -53,4 +53,4 @@ class App extends React.Component<AppProps, AppState> {
   }
 }
 
-export default App;
+export default Root;
