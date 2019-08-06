@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/TSequencer/static/css/main.a3c2e0a1.chunk.css",
+    "main.js": "/TSequencer/static/js/main.4ad679ba.chunk.js",
+    "main.js.map": "/TSequencer/static/js/main.4ad679ba.chunk.js.map",
+    "runtime~main.js": "/TSequencer/static/js/runtime~main.aea8c201.js",
+    "runtime~main.js.map": "/TSequencer/static/js/runtime~main.aea8c201.js.map",
+    "static/js/2.c9e9099d.chunk.js": "/TSequencer/static/js/2.c9e9099d.chunk.js",
+    "static/js/2.c9e9099d.chunk.js.map": "/TSequencer/static/js/2.c9e9099d.chunk.js.map",
+    "index.html": "/TSequencer/index.html",
+    "precache-manifest.55f93acdcfd5cff6f68f10a086db2b70.js": "/TSequencer/precache-manifest.55f93acdcfd5cff6f68f10a086db2b70.js",
+    "service-worker.js": "/TSequencer/service-worker.js",
+    "static/css/main.a3c2e0a1.chunk.css.map": "/TSequencer/static/css/main.a3c2e0a1.chunk.css.map"
+  }
+}
