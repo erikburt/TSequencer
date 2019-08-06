@@ -1,0 +1,21 @@
+div.dis,
+div.ena,
+div.step {
+  margin: 1px;
+  border: 1px solid black;
+  width: 14px;
+  height: 0;
+  padding-bottom: 15px;
+}
+
+div.dis {
+  background: white;
+}
+
+div.ena {
+  background: gray;
+}
+
+div.step {
+  background: blue;
+}

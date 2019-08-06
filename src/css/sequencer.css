@@ -1,0 +1,51 @@
+div.seqActive,
+div.sequencer {
+  margin: 7px;
+  padding: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  float: left;
+  width: 145px;
+}
+
+div.seqActive {
+  background: red;
+}
+
+.bpmslider,
+.slider {
+  -webkit-appearance: none;
+  height: 10px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+}
+
+.bpmslider::-webkit-slider-thumb,
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: black;
+  cursor: pointer;
+}
+
+.bpmslider::hover,
+.slider:hover {
+  opacity: 1;
+}
+
+.bpmslider {
+  width: 90%;
+  margin: 10px;
+  text-align: center;
+}
+
+.slider {
+  width: 100%;
+}
