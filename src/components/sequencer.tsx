@@ -22,6 +22,9 @@ export interface SequencerState {
 }
 
 class Sequencer extends React.Component<SequencerProps, SequencerState> {
+  static readonly DEFAULT_VOLUME = 100;
+  static readonly DEFAULT_PAN = 0;
+
   constructor(props: SequencerProps) {
     super(props);
 
@@ -34,8 +37,8 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
       steps,
       toPlay: false,
       prevStep: this.props.step,
-      volume: 100,
-      pan: 0
+      volume: Sequencer.DEFAULT_VOLUME,
+      pan: Sequencer.DEFAULT_PAN
     };
 
     this.toggle = this.toggle.bind(this);
@@ -48,12 +51,12 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
   };
 
   volumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const volume = parseInt(e.currentTarget.value) || 100;
+    const volume = parseInt(e.currentTarget.value) || Sequencer.DEFAULT_VOLUME;
     this.setState({ volume });
   };
 
   panChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const pan = parseFloat(e.currentTarget.value) || 0;
+    const pan = parseFloat(e.currentTarget.value) || Sequencer.DEFAULT_PAN;
     this.setState({ pan });
   };
 
