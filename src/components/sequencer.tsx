@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { Component } from 'react';
-import Step from './step';
-import '../css/sequencer.css';
-import AudioBufferWrapper from '../tools/audioBufferWrapper';
+import * as React from "react";
+import { Component } from "react";
+import Step from "./step";
+import "../css/sequencer.css";
+import AudioBufferWrapper from "../tools/audioBufferWrapper";
 
 export interface SequencerProps {
   id: number;
@@ -65,7 +65,7 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
     e.preventDefault();
     e.stopPropagation();
 
-    if (e.dataTransfer.files) {
+    if (e.dataTransfer.files.length !== 0) {
       //TODO: Handle the rest of the files
       const file: File = e.dataTransfer.files[0];
       this.props.audio.updateSoundWithFile(file);
@@ -73,13 +73,13 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
   };
 
   render() {
-    let className = 'sequencer';
+    let className = "sequencer";
 
     if (
       this.state.steps[this.props.step] &&
       this.props.step !== this.state.prevStep
     ) {
-      className = 'seqActive';
+      className = "seqActive";
       this.setState({ prevStep: this.props.step });
       this.props.audio.play(this.state.volume, this.state.pan);
     }
