@@ -47,12 +47,12 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
 
   volumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseInt(e.currentTarget.value) || Sequencer.DEFAULT_VOLUME;
-    this.setState({ volume });
+    this.props.audio.volume = volume;
   };
 
   panChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pan = parseFloat(e.currentTarget.value) || Sequencer.DEFAULT_PAN;
-    this.setState({ pan });
+    this.props.audio.pan = pan;
   };
 
   handleDragOver = (e: React.DragEvent<HTMLInputElement>) => {
@@ -79,7 +79,7 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
     ) {
       className = "seqActive";
       this.setState({ prevStep: this.props.step });
-      this.props.audio.play(this.state.volume, this.state.pan);
+      this.props.audio.play();
     }
 
     return (
@@ -102,8 +102,8 @@ class Sequencer extends React.Component<SequencerProps, SequencerState> {
             className="slider"
             type="range"
             min="1"
-            max="100"
-            defaultValue="100"
+            max="120"
+            defaultValue={"" + this.props.audio.volume}
             id="volumeSlider"
             onInput={this.volumeChange}
           />

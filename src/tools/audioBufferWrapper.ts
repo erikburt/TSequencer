@@ -4,6 +4,8 @@ class AudioBufferWrapper {
   buffer: AudioBuffer | null = null;
   gainNode: GainNode;
   panNode: StereoPannerNode;
+  volume: number = 100;
+  pan: number = 0;
 
   constructor(audioContext: AudioContext, audioUrl: string) {
     this.audioContext = audioContext;
@@ -59,12 +61,12 @@ class AudioBufferWrapper {
     fr.readAsArrayBuffer(file);
   }
 
-  play(volume: number, pan: number): void {
+  play(): void {
     if (this.buffer == null)
       console.error(`Buffer is null for ${this.filename}`);
 
-    this.gainNode.gain.value = volume / 100;
-    this.panNode.pan.value = pan;
+    this.gainNode.gain.value = this.volume / 100;
+    this.panNode.pan.value = this.pan;
 
     //TODO: Prepare a source node for play after one is played for the next iteration. To reduce latency when playing
     let source = this.audioContext.createBufferSource();
