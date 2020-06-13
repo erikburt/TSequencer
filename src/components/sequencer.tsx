@@ -22,10 +22,7 @@ const Sequencer = (props: SequencerProps) => {
   const { step, audio, id, numSteps } = props;
   const DEFAULT_VOLUME = 100;
   const DEFAULT_PAN = 0;
-  const [steps, setSteps] = React.useState([
-    ...new Array(numSteps).fill(false),
-  ]);
-  const [prevStep, setPrevStep] = React.useState(step);
+  const [steps, setSteps] = React.useState(new Array(numSteps).fill(false));
 
   const toggle = (id: number, activated: boolean) => {
     const newSteps = [...steps];
@@ -62,7 +59,6 @@ const Sequencer = (props: SequencerProps) => {
 
   if (steps[step]) {
     className = "seqActive";
-    // setPrevStep(step);
     audio.play();
   }
 

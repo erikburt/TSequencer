@@ -33,39 +33,67 @@ export interface SequencerContainerState {
   bpm: number;
 }
 
-const SequencerContainer = (props: SequencerContainerProps) => {
-  const { bpm, audioContext, numSequencers } = props;
-  const interval = Math.ceil((60 * 1000) / bpm);
-  const audioRefs = AUDIO_ARRAY.map(
-    (filename) => new AudioBufferWrapper(audioContext, `/audio/${filename}`)
-  );
-  const [step, setStep] = React.useState(0);
-  const NUM_STEPS = 64;
+class SequencerContainer extends React.Component<
+  SequencerContainerProps,
+  SequencerContainerState
+> {
+  static readonly NUM_STEPS = 64;
 
-  React.useEffect(() => {
-    const timer = window.setInterval(function () {
-      console.log("step", step);
-      setStep((step + 1) % NUM_STEPS)
-    }, interval);
-    return () => clearInterval(timer);
-  }, []);
+  timer: number = 0;
 
-  return (
-    <>
-      {new Array(numSequencers).fill(0).map((elem, i) => {
-        const audio = audioRefs[i % audioRefs.length];
-        return (
-          <Sequencer
-            key={i}
-            id={i}
-            numSteps={NUM_STEPS}
-            step={step}
-            audio={audio}
-          />
-        );
-      })}
-    </>
-  );
-};
+  constructor(props: SequencerContainerProps) {
+    super(props);
+
+    const { bpm } = props;
+
+    const audioRefs = AUDIO_ARRAY.map(
+      (filename) =>
+        new AudioBufferWrapper(this.props.audioContext, `/audio/${filename}`)
+    );
+
+    this.state = {
+      step: 0,
+      interval: Math.ceil((60 * 1000) / bpm),
+      audioRefs,
+      bpm,
+    };
+  }
+
+  tick() {
+    const step = (this.state.step + 1) % SequencerContainer.NUM_STEPS;
+    this.setState({
+      step,
+    });
+  }
+
+  componentDidMount() {
+    this.timer = window.setInterval(() => {
+      this.tick();
+    }, this.state.interval);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+
+  render() {
+    return (
+      <>
+        {new Array(this.props.numSequencers).fill(0).map((elem, i) => {
+          const audio = this.state.audioRefs[i % this.state.audioRefs.length];
+          return (
+            <Sequencer
+              key={i}
+              id={i}
+              numSteps={SequencerContainer.NUM_STEPS}
+              step={this.state.step}
+              audio={audio}
+            />
+          );
+        })}
+      </>
+    );
+  }
+}
 
 export default SequencerContainer;
