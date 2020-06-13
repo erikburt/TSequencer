@@ -42,15 +42,10 @@ const SequencerContainer = (props: SequencerContainerProps) => {
   const [step, setStep] = React.useState(0);
   const NUM_STEPS = 64;
 
-  const tick = () => {
-    const newStep = (step + 1) % NUM_STEPS;
-    setStep(newStep);
-  };
-
   React.useEffect(() => {
     const timer = window.setInterval(function () {
       console.log("step", step);
-      tick();
+      setStep((step + 1) % NUM_STEPS)
     }, interval);
     return () => clearInterval(timer);
   }, []);
