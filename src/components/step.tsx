@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Component } from "react";
-import "../css/step.css";
+import styled from "styled-components";
 
 export interface StepProps {
   id: number;
@@ -12,32 +11,40 @@ export interface StepState {
   activated: boolean;
 }
 
-class Step extends React.Component<StepProps, StepState> {
-  constructor(props: StepProps) {
-    super(props);
+const StyledDiv = styled.div`
+  margin: 1px;
+  border: 1px solid black;
+  width: 14px;
+  height: 0;
+  padding-bottom: 15px;
+`;
 
-    this.state = {
-      activated: false
-    };
-  }
+const StepDiv = styled(StyledDiv)`
+  background: blue;
+`;
+const EnaDiv = styled(StyledDiv)`
+  background: gray;
+`;
+const DisDiv = styled(StyledDiv)`
+  background: white;
+`;
 
-  toggle = () => {
-    const activated = !this.state.activated;
-    this.setState({ activated });
-    this.props.toggleFunc(this.props.id, activated);
+const Step = (props: StepProps) => {
+  const { id, step, toggleFunc } = props;
+  const [activated, setActivated] = React.useState(false);
+
+  const toggle = () => {
+    toggleFunc(id, !activated);
+    setActivated(!activated);
   };
 
-  render() {
-    const { id, step } = this.props;
-    const { activated } = this.state;
-    let className = "";
-
-    if (step === id) className = "step";
-    else if (activated) className = "ena";
-    else className = "dis";
-
-    return <div className={className} onClick={this.toggle} />;
-  }
-}
+  return step === id ? (
+    <StepDiv onClick={toggle} />
+  ) : activated ? (
+    <EnaDiv onClick={toggle} />
+  ) : (
+    <DisDiv onClick={toggle} />
+  );
+};
 
 export default Step;

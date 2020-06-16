@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Component } from "react";
-import Sequencer from "./sequencer";
+import Sequencer from "./Sequencer";
 import AudioBufferWrapper from "../tools/audioBufferWrapper";
 
 const AUDIO_ARRAY = [
@@ -18,7 +17,7 @@ const AUDIO_ARRAY = [
   "snare02.wav",
   "tom01.wav",
   "tom02.wav",
-  "tom03.wav"
+  "tom03.wav",
 ];
 
 export interface SequencerContainerProps {
@@ -47,8 +46,8 @@ class SequencerContainer extends React.Component<
 
     const { bpm } = props;
 
-    let audioRefs = AUDIO_ARRAY.map(
-      filename =>
+    const audioRefs = AUDIO_ARRAY.map(
+      (filename) =>
         new AudioBufferWrapper(this.props.audioContext, `/audio/${filename}`)
     );
 
@@ -56,15 +55,14 @@ class SequencerContainer extends React.Component<
       step: 0,
       interval: Math.ceil((60 * 1000) / bpm),
       audioRefs,
-      bpm
+      bpm,
     };
   }
 
   tick() {
     const step = (this.state.step + 1) % SequencerContainer.NUM_STEPS;
-
     this.setState({
-      step
+      step,
     });
   }
 
@@ -78,39 +76,23 @@ class SequencerContainer extends React.Component<
     clearInterval(this.timer);
   }
 
-  updateBPM = () => {
-    const { bpm } = this.props;
-    this.setState({ bpm, interval: Math.ceil((60 * 1000) / bpm) });
-
-    clearInterval(this.timer);
-
-    this.timer = window.setInterval(() => {
-      this.tick();
-    }, this.state.interval);
-  };
-
   render() {
-    if (this.props.bpm !== this.state.bpm) {
-      this.updateBPM();
-    }
-
-    let sequencers: JSX.Element[] = [];
-
-    for (let i = 0; i < this.props.numSequencers; i++) {
-      const audio = this.state.audioRefs[i % this.state.audioRefs.length];
-
-      sequencers.push(
-        <Sequencer
-          key={i}
-          id={i}
-          numSteps={SequencerContainer.NUM_STEPS}
-          step={this.state.step}
-          audio={audio}
-        />
-      );
-    }
-
-    return sequencers;
+    return (
+      <>
+        {new Array(this.props.numSequencers).fill(0).map((elem, i) => {
+          const audio = this.state.audioRefs[i % this.state.audioRefs.length];
+          return (
+            <Sequencer
+              key={i}
+              id={i}
+              numSteps={SequencerContainer.NUM_STEPS}
+              step={this.state.step}
+              audio={audio}
+            />
+          );
+        })}
+      </>
+    );
   }
 }
 
